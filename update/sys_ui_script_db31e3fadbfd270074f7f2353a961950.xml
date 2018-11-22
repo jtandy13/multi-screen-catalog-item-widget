@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <name>x_snc_multicat.Service.McUtilUpload</name>
+        <script><![CDATA[McUtil.service('McUtilUpload', function McUtilUpload ($http, $q, $window) {
+	
+	'use strict';
+	//console.log(McUtil);
+
+	var attachmentGuid;
+	var tableName;
+	
+	return {
+		upload: upload,
+		init: init
+	};
+
+	function init(table, sysId) {
+		attachmentGuid = sysId;
+		tableName = table;
+	}
+
+	function upload(files) {
+		return $q(function (success, failure) {
+
+			Array.prototype.forEach.call(files, function(file) {
+
+				var fd = new $window.FormData();
+				fd.append('attachments_modified', true);
+				fd.append('sysparm_table', tableName);
+				fd.append('sysparm_sys_id', attachmentGuid);
+				fd.append('sysparm_nostack', 'yes');
+				fd.append('sysparm_encryption_context', '');
+				fd.append('sysparm_ck', $window.g_ck);
+				fd.append('attachFile', file);
+
+				$http.post('/angular.do', fd, {
+					transformRequest: $window.angular.identity,
+					params: {
+						'sysparm_type': 'ngk_attachments',
+						'table': tableName,
+						'sys_id': attachmentGuid,
+						'action': 'add'
+					},
+					headers: {
+						'X-UserToken' : $window.g_ck,
+						'Content-Type': undefined
+					}
+				}).then(function (response) {
+					success(response);
+				});
+
+			});
+
+		});
+	}
+});]]></script>
+        <script_name>Service.McUtilUpload</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-19 23:53:59</sys_created_on>
+        <sys_id>db31e3fadbfd270074f7f2353a961950</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>x_snc_multicat.Service.McUtilUpload</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_update_name>sys_ui_script_db31e3fadbfd270074f7f2353a961950</sys_update_name>
+        <sys_updated_by>james.tandy@snc</sys_updated_by>
+        <sys_updated_on>2018-11-20 02:21:10</sys_updated_on>
+        <ui_type>1</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function ($scope, $location, nowAttachmentHandler, spScUtil, spUtil, spModal, McUtilUpload, McUtilContainers) {
+  var c = this;
+  var DEFAULT_RECORD_PRODUCER_REDIRECT_PAGE = 'ticket';
+
+  
+  c.isFirstScreen = McUtilContainers.isFirstScreen;
+  c.isLastScreen = McUtilContainers.isLastScreen;
+  c.next = McUtilContainers.next;
+  c.previous = McUtilContainers.previous;
+  c.getCurrentScreenTitle = McUtilContainers.getCurrentScreenTitle;
+  c.getScreenCountAsArray = McUtilContainers.getScreenCountAsArray;
+  c.getCurrentScreen = McUtilContainers.getCurrentScreen;
+  c.goToScreen = McUtilContainers.goToScreen;
+  c.getScreenOfField = McUtilContainers.getScreenOfField;
+
+  c.$onInit = function () {
+    McUtilContainers.init(c.data.sc_cat_item._sections, c.data.sc_cat_item.sys_class_name);
+
+    c.requestedFor = { 
+      displayValue: c.data.requestedFor.displayValue,
+      value: c.data.requestedFor.value,
+      name: 'requested_for'
+    }
+
+    c.quantity = c.data.quantity ? c.data.quantity + "" : "1";
+  }
+
+  c.cancel = function() {
+    c.setCheckingOut(false);
+  }
+
+  c.getCurrentTitle = function(sys_class_name) {
+    if(c.getCurrentScreen() == 0) {
+      return c.data.sc_cat_item.name;
+    } else if (c.isLastScreen() && !c.isRecordProducer()) {
+      return c.options.checkoutTitle || 'Order Confirmation';
+    } else {
+      return c.getCurrentScreenTitle(sys_class_name, c.data.sc_cat_item.name);
+    }
+  }
+
+  c.isRecordProducer = function(){
+    return c.data.sc_cat_item.sys_class_name === 'sc_cat_item_producer';
+  }
+
+  c.confirmOrder = function() {
+    c.confirmed = 'asking';
+    spModal.open({
+      title: 'Confirm Order?',
+      message: 'Please confirm your order to proceed.'
+    }).then(function(confirmed) {
+      if (confirmed.label == 'OK') {
+        c.triggerOnSubmit();
+      }
+    });
+  }
+
+  c.triggerOnSubmit = function(){
+    if (validateMandatoryFields()) {
+      $scope.data.sc_cat_item.quantity = c.quantity;
+      $scope.data.sc_cat_item.item_action = "order";
+      if (g_form)
+        return g_form.submit();
+      return false;
+    }
+  }
+
+  c.triggerAddToCart = function () {
+    if (validateMandatoryFields()) {
+      $scope.data.sc_cat_item.item_action = "add_to_cart";
+      $scope.data.sc_cat_item.quantity = c.quantity;
+      if (g_form)
+        return g_form.submit();
+      return false;
+    }
+  }
+  
+  c.triggerUpdateCart = function() {
+		$scope.data.sc_cat_item.item_action = "update_cart";
+		$scope.data.sc_cat_item.quantity = c.quantity;
+		if (g_form)
+			return g_form.submit();
+		return false;
+	}
+
+  c.hasImage = function() {
+    return c.data.sc_cat_item.picture != '';
+  }
+
+  c.isCartItem = function() {
+    return c.data.is_cart_item;
+  }
+  
+  function validateMandatoryFields() {
+    var fieldNames = g_form.getFieldNames();
+    var mandatoryFieldsWithoutValue = fieldNames.filter(function(field) {
+      return g_form.isMandatory(field) && !hasValue(field, g_form);
+    });
+    if (mandatoryFieldsWithoutValue.length > 0) {
+      notifyUserOfMandFieldsWithoutValue(mandatoryFieldsWithoutValue);
+      c.goToScreen(c.getScreenOfField(mandatoryFieldsWithoutValue[0]));
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  function notifyUserOfMandFieldsWithoutValue(fieldNames) {
+    g_form.addErrorMessage('Some fields are incomplete');
+    fieldNames.forEach(function(fieldName) {
+      g_form.showFieldMsg(fieldName, "This field must be completed", 'error');
+    });
+  }
+
+  /**
+   * Check whether a particular field on a form has a value
+   * Copied from /scripts/sn/common/clientScript/glideFormFieldFactory.js
+   * @param  {String}  fieldName     The name of the field to check
+   * @param  {Object}  gFormInstance The GlideForm of the form with the field
+   * @return {Boolean}               Whether the field has a value
+   */
+  function hasValue(fieldName, gFormInstance) {
+
+    var field = gFormInstance.getField(fieldName);
+    var value = gFormInstance.getValue(fieldName);
+
+    switch (field.type) {
+      case 'boolean_confirm':
+        return value === 'true';
+      case 'boolean':
+        return true;
+      case 'currency':
+        var currencyValues = value.split(';');
+        return currencyValues[1] && currencyValues[1].length;
+    }
+
+    if (value === null) {
+      return false;
+    }
+
+    if (typeof value === 'undefined') {
+      return false;
+    }
+
+    var trimmed = String(value).trim();
+    return trimmed.length > 0;
+  }
+
+  /* Setup attachment handler */
+  $scope.attachmentHandler = new nowAttachmentHandler(function appendDone () {
+    $scope.$broadcast("sp.attachments.update", c.data.form._attachmentGUID);
+  }, function appendError () {
+    /* $scope.errorMessages.push(error); */
+    /* spUtil.addErrorMessage(error.msg + error.fileName); */
+  });
+  $scope.$evalAsync(function() {
+    $scope.attachmentHandler.setParams($scope.data._attachmentTable, $scope.data._generatedItemGUID, 1024 * 1024 * $scope.data.maxAttachmentSize);
+  });
+  
+  // Initialize the McUtilUpload service
+  McUtilUpload.init($scope.data._attachmentTable, $scope.data._generatedItemGUID);
+
+
+  c.getItemId = function () {
+		return $scope.data.sc_cat_item ? $scope.data.sc_cat_item.sys_id : -1;
+  };
+  
+  function getOne() {
+    $scope.server.get({
+			action: 'log_request',
+			itemDetails: {sys_id: $scope.data.sc_cat_item.sys_id, 
+										name: $scope.data.sc_cat_item.name,
+										sys_class_name: $scope.data.sc_cat_item.sys_class_name}
+    });
+    if ($scope.data.sc_cat_item.sys_class_name == "sc_cat_item_producer") {
+      postCatalogFormRequest().then(function (response) {
+        var a = response.data.result;
+        handleRedirect(a.table, a.sys_id);
+      });
+    } else {
+      if (c.data.sys_properties.twostep) {
+        // Set additional parameters and add them to orderNow function
+        var additionalParms = {
+          sysparm_requested_for: c.requestedFor.value,
+          special_instructions: c.special_instructions,
+          delivery_address: c.deliverTo
+        };
+        spScUtil.orderNow($scope.data.sc_cat_item.sys_id, $scope.data.sc_cat_item.quantity, getVarData($scope.data.sc_cat_item._fields), $scope.data._generatedItemGUID, additionalParms).then(function (response) {
+          var a = response.data.result;
+          $location.search('id=sc_request&is_new_order=true&table=sc_request&sys_id=' + a.sys_id);
+        });
+      } else {
+        spScUtil.orderNow($scope.data.sc_cat_item.sys_id, $scope.data.sc_cat_item.quantity, getVarData($scope.data.sc_cat_item._fields), $scope.data._generatedItemGUID).then(function (response) {
+          var a = response.data.result;
+          $location.search('id=sc_request&is_new_order=true&table=sc_request&sys_id=' + a.sys_id);
+        });
+      }
+    }
+  }
+
+  function handleRedirect(table, sys_id) {
+    var page = '';
+    if (c.isRecordProducer())
+      page = c.options.record_producer_redirect_page || DEFAULT_RECORD_PRODUCER_REDIRECT_PAGE;
+    $location.search(formatRedirectUrl(page, table, sys_id));
+  }
+  
+  function formatRedirectUrl(page, table, sys_id) {
+		var url;
+		var paramObj = {page: page, table: table, sys_id: sys_id};
+		url = spUtil.format(c.options.url, paramObj);
+		return url;
+	}
+
+  function getVarData(fields) {
+		var reqData = {};
+		for(var obj in fields)
+			reqData[fields[obj].name] = fields[obj].value;
+		return reqData;
+	}
+
+  function postCatalogFormRequest() {
+		if ($scope.data.sc_cat_item.sys_class_name === "sc_cat_item_producer")
+			return spScUtil.submitProducer($scope.data.sc_cat_item.sys_id, getVarData($scope.data.sc_cat_item._fields), $scope.data._generatedItemGUID/*, $scope.data.workspaceParams*/);
+    else if ($scope.data.sc_cat_item.item_action === "add_to_cart")
+      return spScUtil.addToCart($scope.data.sc_cat_item.sys_id, $scope.data.sc_cat_item.quantity, getVarData($scope.data.sc_cat_item._fields), $scope.data._generatedItemGUID);
+    else if ($scope.data.is_cart_item)
+			return spScUtil.updateCart($scope.data._generatedItemGUID, $scope.data.sc_cat_item.quantity, getVarData($scope.data.sc_cat_item._fields));
+  }
+
+  function addToCart() {
+    $scope.server.get({
+			action: 'log_request',
+			itemDetails: {sys_id: $scope.data.sc_cat_item.sys_id, 
+										name: $scope.data.sc_cat_item.name,
+										sys_class_name: $scope.data.sc_cat_item.sys_class_name}
+    });
+    postCatalogFormRequest().then(function(response) {
+      $rootScope.$broadcast("$sp.service_catalog.cart.add_item");
+      $rootScope.$broadcast("$sp.service_catalog.cart.update");
+      $scope.$emit("$sp.sc_cat_item.add_to_cart", $scope.data._generatedItemGUID);
+      spUtil.addInfoMessage('Your item has been added to your Cart.');
+      // Refresh the server data so that we won't get a duplicate order
+      $scope.server.refresh();
+    });
+  }
+
+  function updateCart() {
+		postCatalogFormRequest().then(function(response) {
+			$location.search('id=sc_cart');
+		})
+	}
+
+	var g_form;
+	$scope.$on('spModel.gForm.initialized', function(e, gFormInstance){
+    if (gFormInstance.getSysId() != -1 && gFormInstance.getSysId() != c.getItemId())
+			return;
+    g_form = gFormInstance;
+    // This runs after all onSubmit scripts have executed
+		g_form.$private.events.on('submitted', function(){
+			if ($scope.data.sc_cat_item.item_action === "order")
+        getOne();
+      else if ($scope.data.sc_cat_item.item_action === "add_to_cart")
+        addToCart();
+      else if ($scope.data.sc_cat_item.item_action == "update_cart")
+				updateCart();
+		});
+	});
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>/* SCSS Variables and Mixins*/
+$si-mc-max-height: 700px;
+$si-mc-max-width: 950px;
+$si-mc-background-color: #FFFFFF;
+$si-mc-indicator-background-color: #EEEEEE;
+$si-mc-indicator-background-color-active: #2D2B5D;
+$si-mc-indicator-color: #2D2B5D;
+$si-mc-indicator-color-active: #FFFFFF;
+$si-mc-attachment-background-color: #EEEEEE;
+$si-mc-attachment-color: #2D2B5D;
+$si-mc-attachment-btn-background-color: #2D2B5D;
+$si-mc-attachment-pill-background-color: #EEEEEE;
+$si-mc-attachment-pill-color: #2D2B5D;
+$si-mc-attachment-btn-color: #FFFFFF;
+$si-mc-border-radius: 3px !default;
+$si-mc-action-bar-background-color: #DDDDDD;
+
+@mixin title-pack {
+  font-size: 40px;
+  color: #2D2B5D;
+  letter-spacing: -0.5px;
+}
+
+@mixin label-pack {
+  font-size: 16px;
+  color: #2D2B5D;
+  line-height: 24px;
+}
+
+/** SCSS Styles **/
+
+// Drag-drop styles
+
+.si-mc-drag-drop-overlay {
+  display: none;
+}
+
+.is-dragover .si-mc-drag-drop-overlay {
+  display: flex;
+}
+
+.si-mc-drag-drop-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(rgba(255, 255, 255, 1) 20%, rgba(255, 255, 255, 0.5) 80%);
+  border-radius: $si-mc-border-radius;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  justify-content: center;
+  align-items: center;
+  font-size: 80px;
+  color: #ccc;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 10px dashed #ccc;
+}
+
+.si-mc-drag-drop-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 21;
+  cursor: default;
+}
+
+/* Main Content */
+
+.si-multicat-main {
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+  max-height: $si-mc-max-height;
+}
+
+.si-mc-content {
+  background-color: $si-mc-background-color;
+  border-radius: $si-mc-border-radius;
+  display: grid;
+  grid-template-rows: 100px auto 15%;
+  grid-template-areas:
+  "header"
+  "content"
+  "footer";
+}
+
+/* Header */
+
+.si-mc-head {
+  grid-area: header;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 40px;
+}
+
+.si-mc-indicators {
+  display: flex;
+  justify-content: flex-end;
+
+  font-size: 18px;
+
+  div {
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: $si-mc-indicator-background-color;
+    margin-left: 5px;
+    color: $si-mc-indicator-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .si-mc-active {
+    background-color: $si-mc-indicator-background-color-active;
+    color: $si-mc-indicator-color-active;
+  }
+}
+
+.si-mc-attachments, .si-mc-attachments-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  border-radius: $si-mc-border-radius;
+  color: $si-mc-attachment-color;
+
+  div {
+    height: 30px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  
+  li {
+    background-color: $si-mc-attachment-pill-background-color;
+    color: $si-mc-attachment-pill-color;
+    border-radius: $si-mc-border-radius;
+    padding: 3px 5px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 170px;
+    margin: 3px 0 3px 5px;
+    
+    a, a:hover, a:visited, a:focus {
+      color: $si-mc-attachment-pill-color;
+    }
+    
+  }
+
+  .si-mc-label {
+    margin-right: 5px;
+    padding-top: 6px;
+  }
+
+  button {
+    height: 23px;
+    width: 23px;
+    border-radius: $si-mc-border-radius;
+    background-color: $si-mc-attachment-btn-background-color;
+    color: $si-mc-attachment-btn-color;
+    position: relative;
+  }
+
+  i {
+    position: absolute;
+    top: 25%;
+    left: 28%;
+  }
+  
+  li:last-of-type {
+    margin-right: 0;
+  }
+}
+
+.si-mc-attachments-mobile {
+  display: none;
+}
+
+/* Main Body */
+.si-mc-mainbody {
+  grid-area: content;
+  margin-bottom: 40px;
+}
+
+.si-mc-intro-screen {
+  display: flex;
+  flex-wrap: wrap;
+
+  h1 {
+    @include title-pack;
+    margin-top: 0px !important;
+  }
+}
+
+.si-mc-item-img {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 300px;
+  margin: 0px 20px 0px 20px;
+}
+
+.si-mc-cust-desc {
+  margin: 30px 10px 0px 10px;
+}
+
+.si-mc-short-desc {
+  font-size: 16px;
+  color: #979797;
+  line-height: 20px;
+  margin-bottom: 30px !important;
+}
+
+.si-mc-form {
+  margin: 0 60px 0 60px;
+
+  legend {
+    @include title-pack;
+    margin-bottom: 30px;
+  }
+
+  label {
+    @include label-pack;
+  }
+}
+
+.si-mc-extra-detail {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.si-mc-detail-flex-shrink {
+  flex: 0 1;
+}
+
+.si-mc-detail-flex-grow {
+  flex: 1 0;
+  margin: 0 60px 0 0;
+
+  h1 {
+    @include title-pack;
+    margin-top: 0px !important;
+  }
+
+  label {
+    @include label-pack;
+  }
+}
+
+.si-mc-checkout-data {
+  margin-bottom: 10px;
+}
+
+.si-mc-checkout-data:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Footer */
+.si-mc-actions {
+  grid-area: footer;
+  height: 100%;
+}
+
+.si-mc-action-bar {
+  min-height: 80px;
+  border-bottom-left-radius: $si-mc-border-radius;
+  border-bottom-right-radius: $si-mc-border-radius;
+  background-color: $si-mc-action-bar-background-color;
+  display: flex;
+  align-items: center;
+
+  button {
+    height: 44px;
+    padding: 10px 30px 10px 30px;
+    border-radius: $si-mc-border-radius;
+  }
+}
+
+.si-mc-primary {
+  flex: 1 0;
+
+  .action-group {
+    float: right;
+  }
+
+  .action-group:last-child {
+    margin-right: 20px;
+  }
+
+
+  button {
+    background-color: #2D2B5D;
+    border: 0px;
+    font-size: 18px;
+    color: #FFFFFF;
+  }
+}
+
+.si-mc-secondary {
+  flex: 1 0;
+
+  button {
+    background-color: transparent;
+    border: 2px solid #2D2B5D;
+    color: #2D2B5D;
+    margin-left: 20px;
+  }
+}
+
+
+/* Media Queries */
+@media (min-width: 320px) and (max-width: 480px) {
+  .si-mc-content {
+    background-color: $si-mc-background-color;
+    border-radius: $si-mc-border-radius;
+    display: grid;
+    grid-template-rows: auto 15%;
+    grid-template-areas:
+    "content"
+    "footer";
+  }
+
+  .si-mc-head {
+    display: none;
+  }
+
+  .si-mc-form {
+    margin: 0;
+
+    legend {
+      font-size: 30px;
+    }
+  }
+
+  .si-mc-detail-flex-grow {
+    margin: 0;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .si-mc-action-bar {
+    min-height: 0px;
+    border-bottom-left-radius: $si-mc-border-radius;
+    border-bottom-right-radius: $si-mc-border-radius;
+    background-color: $si-mc-action-bar-background-color;
+    display: flex;
+    flex-direction: column;
+  
+    button {
+      height: 44px;
+      width: 100%;
+      padding: 10px 0 10px 0;
+      margin: 10px 0 0 0;
+      border-radius: $si-mc-border-radius;
+    }
+  }
+
+  .si-mc-action-bar &gt; div {
+    width: 100%;
+    flex: 0 1;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .action-group {
+    width: 100%;
+  }
+
+  .action-group:last-child {
+    margin-right: 0 !important;
+    margin-bottom: 10px;
+  }
+
+  .si-mc-attachments {
+    display: none;
+  }
+
+  .si-mc-attachments-mobile {
+    display: flex;
+  
+    ul {
+      flex-direction: column;
+    }
+  
+    .si-mc-label {
+      position: relative;
+      flex: 1 0;
+      align-self: flex-start;
+
+      span {
+        position: relative;
+        bottom: 5px;
+      }
+    }
+  }
+  
+  .si-mc-indicators {
+    display: none;
+  }
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>multicat</id>
+        <internal>false</internal>
+        <link/>
+        <name>Multi-Screen Catalog Item</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// populate the 'data' variable with catalog item, variables, and variable view
+(function () {
+
+  options.url = options.url || 'id={page}&is_new_order=true&table={table}&sys_id={sys_id}';
+  options.disable_req_for = options.disable_req_for || true;
+  // Comma separated fields to display in snRecordPicker directive
+  options.reqForDispCols = options.reqForDispCols || 'name';
+  options.reqForQuery = options.reqForQuery || 'active=true';
+  // Comma separated fields to search for in snRecordPicker directive
+  options.reqForSearchCols = options.reqForSearchCols || 'name';
+
+  if (input && input.action === 'log_request') {
+    $sp.logStat('Cat Item Request', input.itemDetails.sys_class_name, input.itemDetails.sys_id, input.itemDetails.name);
+    return;
+  }
+
+  // Are we using a two-step checkout process?
+  data.sys_properties = {
+    twostep: gs.getProperty("glide.sc.sp.twostep", "true") == 'true'
+    //twostep: false
+  };
+
+  // Define our initial set of choices and value for the quantity field
+  var clGenerator = new GlideChoiceList();
+  var choiceListQuantity = clGenerator.getChoiceList("sc_cart_item", "quantity");
+  var choicelistQuantityData = [];
+  //Function call changed from size() to getSize() for ScopedChoiceList
+  for (var i = 0; i < choiceListQuantity.getSize(); i++) {
+    //Function call changed from get() to getChoice() for ScopedChoiceList
+    var choice = choiceListQuantity.getChoice(i);
+    if (!isNaN(choice.getValue()))
+      choicelistQuantityData.push({ value: parseInt(choice.getValue()), label: choice.getLabel() });
+  }
+  data.choiceListQuantity = choicelistQuantityData;
+  data.quantity = choicelistQuantityData[0].value;
+
+  // Are we editing an item from the cart? If so, populate our data based on the original item
+  var edit_parm = $sp.getParameter('edit');
+  data.is_cart_item = edit_parm == 'cart';
+
+  var cartName = data.is_cart_item ? 'DEFAULT' : 'saved_items';
+  var cart = new sn_sc.CartJS(cartName);
+  data.requestedFor = {value: gs.getUser().getID(), displayValue: gs.getUser().getDisplayName()};
+
+
+  if (edit_parm) {
+    var cart_item_id = $sp.getParameter("sys_id");
+    var gr = new GlideRecord("sc_cart_item");
+    if (!gr.get(cart_item_id) || gr.cart != cart.getCartID()) {
+      data.recordFound = false;
+      return;
+    }
+
+    var catItemData = {};
+    catItemData.sys_id = gr.getValue('cat_item');
+    catItemData.cart_item_id = gr.getUniqueValue();
+    catItemData.table = "sc_cart_item";
+    catItemData.is_ordering = true;
+
+    data.sc_cat_item = $sp.getCatalogItem(catItemData.sys_id);
+    data.sc_cat_item.isCartItem = true;
+    var values = getValues(cart_item_id);
+
+    for (var f in data.sc_cat_item._fields) {
+      // Put the values into the cat item fields
+      var field = data.sc_cat_item._fields[f];
+      if (typeof values[f] != "undefined" && typeof values[f].value != "undefined") {
+        if (values[f].type == 9 || values[f].type == 10)
+          field.value = values[f].displayValue;
+        else if (values[f].type == 25)
+          field.value = values[f].decrypted_value;
+        else
+          field.value = values[f].value;
+        field.displayValue = values[f].displayValue;
+        field.display_value_list = values[f].display_value_list;
+      }
+      updatePriceOnField(field);
+    }
+
+    data._generatedItemGUID = cart_item_id;
+    data.quantity = '' + gr.quantity;
+
+  } else {
+    data.sys_id = $sp.getParameter('sys_id');
+    data.sc_cat_item = $sp.getCatalogItem(data.sys_id, true);
+    data._generatedItemGUID = gs.generateGUID();
+  }
+
+  data._attachmentTable = 'sc_cart_item';
+
+
+  data.showPrices = $sp.showCatalogPrices();
+
+  data.maxAttachmentSize = parseInt(gs.getProperty('com.glide.attachment.max_size', 1024));
+  if (isNaN(data.maxAttachmentSize))
+    data.maxAttachmentSize = 24;
+
+  function getValues(sys_id) {
+    var qs = new sn_sc.VariablePoolQuestionSetJS();
+    qs.setCartID(sys_id);
+    qs.load();
+    var values = {};
+    var questions = qs.getFlatQuestions();
+    for (var i = 0; i < questions.length; i++) {
+      var qKey = questions[i].name;
+      if (typeof qKey == 'undefined' || qKey == '')
+        qKey = "IO:" + questions[i].sys_id;
+      values[qKey] = questions[i];
+    }
+    return values;
+  }
+
+  // Pricing utility functions
+  function setPrice(field, p, rp) {
+    if (p != undefined)
+      field.price = p;
+    if (rp != undefined)
+      field.recurring_price = rp;
+  }
+
+  function updatePriceForReferenceTable(field) {
+    var tableName = field.refTable + '';
+    if (tableName != undefined && tableName != null && tableName != '') {
+      var gr = new GlideRecord(tableName);
+      if (gr.isValid()) {
+        if (gr.get(field.value) && gr.isValidRecord()) {
+          updatePrice(gr, field);
+          updateRecurringPrice(gr, field);
+        }
+      }
+    }
+  }
+
+  function updatePriceForListCollector(field) {
+    var tableName = field.refTable + '';
+    if (tableName != undefined && tableName != null && tableName != '') {
+      var gr = new GlideRecord(tableName);
+      if (gr.isValid()) {
+        var values = field.value.split(',');
+        gr.addQuery('sys_id', values);
+        gr.query();
+        var p = 0.0;
+        var rp = 0.0;
+        var price_value_list = [];
+        while (gr.next()) {
+          var price_field = {};
+          updatePrice(gr, price_field);
+          updateRecurringPrice(gr, price_field);
+          if (price_field.price)
+            p += Number(price_field.price);
+          else
+            price_field.price = 0.0;
+          if (price_field.recurring_price)
+            rp += Number(price_field.recurring_price);
+          else
+            price_field.recurring_price = 0.0;
+          price_value_list.push(price_field);
+        }
+        field.price = p;
+        field.recurring_price = rp;
+        field.price_value_list = price_value_list;
+      }
+    }
+  }
+
+  function updatePrice(gr, field) {
+    if (gr.isValidField('price'))
+      field.price = gr.getValue('price');
+    else if (gr.isValidField('u_price'))
+      field.price = gr.getValue('u_price');
+  }
+
+  function updateRecurringPrice(gr, field) {
+    if (gr.isValidField('recurring_price'))
+      field.recurring_price = gr.getValue('recurring_price');
+    else if (gr.isValidField('u_recurring_price'))
+      field.recurring_price = gr.getValue('u_recurring_price');
+  }
+
+  function updatePriceOnField(field) {
+    if (field.type == 'boolean' || field.type == 'boolean_confirm') {
+      if (field.value == 'true' || field.value == true)
+        setPrice(field, field._pricing.price_if_checked, field._pricing.recurring_price_if_checked);
+      else
+        setPrice(field, 0, 0);
+    } else if (field.choices) {
+      field.choices.forEach(function (choice) {
+        if (choice.value + '' == field.value + '')
+          setPrice(field, choice.price, choice.recurring_price);
+      });
+    } else if (field._pricing && field._pricing.pricing_implications === true) {
+      if (field.type == 'reference')
+        updatePriceForReferenceTable(field);
+      else if (field.type == 'glide_list')
+        updatePriceForListCollector(field);
+    }
+  }
+})()]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-19 23:49:56</sys_created_on>
+        <sys_id>947027badbfd270074f7f2353a96195c</sys_id>
+        <sys_mod_count>185</sys_mod_count>
+        <sys_name>Multi-Screen Catalog Item</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_update_name>sp_widget_947027badbfd270074f7f2353a96195c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-11-22 03:59:36</sys_updated_on>
+        <template><![CDATA[<div class="si-multicat-main" si-mc-drag-drop-upload>
+
+  <!-- Drag and drop overlay -->
+  <div class="si-mc-drag-drop-overlay">
+    <div class="si-mc-drag-drop-mask"></div>
+    <div>
+      <i class="fa fa-upload" aria-hidden="true"></i>
+      <br/> Upload
+    </div>
+  </div>
+
+  <div class="si-mc-content">
+    <!-- Header -->
+    <div class="si-mc-head">
+
+      <div class="si-mc-attachments">
+        <div class="si-mc-label">Attachments</div>
+        <button si-mc-button-upload>
+          <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+        <si-mc-attachment-manager table="::c.data._attachmentTable" sys-id="::c.data._generatedItemGUID" omit-edit="false"></si-mc-attachment-manager>
+      </div>
+      
+      
+
+      <!-- Indicators -->
+      <div class="si-mc-indicators">
+        <div ng-repeat="i in c.getScreenCountAsArray() track by $index" ng-class="{'si-mc-active': c.getCurrentScreen() === $index}"
+          ng-click="c.goToScreen($index)">{{$index + 1}}</div>
+      </div>
+
+    </div>
+
+    <!-- Main body -->
+    <div class="si-mc-mainbody">
+
+      <!-- Intro screen -->
+      <div ng-include="'si-mc-intro-screen'" ng-if="c.getCurrentScreen() == 0"></div>
+
+      <!-- Form Screens-->
+      <div class="si-mc-form">
+        <!-- spCatItem directive manages price changes for the catalog item -->
+        <sp-cat-item item="::data.sc_cat_item" ></sp-cat-item>
+        <div class="si-mc-mainform container-fluid">
+          <sp-model form-model="::data.sc_cat_item" template-url="si-mc-form" mandatory="c.mandatory"></sp-model>
+        </div>
+      </div>
+
+      <!-- Order Now Screen -->
+      <div ng-include="'si-mc-order-now-screen'" ng-if="c.isLastScreen() && !c.isRecordProducer()"></div>
+      
+    </div>
+    <!-- Actions -->
+    <div class="si-mc-actions">
+      <div class="si-mc-action-bar">
+        <!-- Left side (secondary) -->
+        <div class="si-mc-secondary">
+          <button ng-click="c.previous()" ng-if="c.getCurrentScreen() > 0">
+            PREVIOUS
+          </button>
+        </div>
+    
+        <!-- Right side (primary) -->
+        <div class="si-mc-primary">
+          <div class="action-group">
+            <button ng-click="c.next()" ng-if="!c.isLastScreen()">
+              NEXT
+            </button>
+            <button ng-click="c.triggerOnSubmit()" ng-if="c.isLastScreen() && c.isRecordProducer()">
+              ${SUBMIT}
+            </button>
+            <button ng-if="c.isLastScreen() && !c.isRecordProducer() && !c.isCartItem()" ng-click="c.triggerAddToCart()">
+              <i class="fa fa fa-shopping-cart"></i>
+              &ensp;${ADD TO CART}
+            </button>
+            <button ng-if="c.isLastScreen() && !c.isRecordProducer() && c.isCartItem()" ng-click="c.triggerUpdateCart()">
+              <i class="fa fa fa-shopping-cart"></i>
+              &ensp;${UPDATE CART}
+            </button>
+            <button ng-if="c.isLastScreen() && !c.isRecordProducer()" ng-click="c.confirmOrder()">
+              ${ORDER NOW}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

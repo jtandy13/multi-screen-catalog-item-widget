@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <name>x_snc_multicat.Service.McUtilContainers</name>
+        <script><![CDATA[McUtil.service('McUtilContainers', function McUtilContainers(){
+	'use strict';
+	
+	//console.log(McUtil);
+	
+  var form_containers = [];
+  var totalScreenCount = 0;
+  var currentScreen = 0;
+  var checkingOut = false;
+  
+	
+	return {
+    init: init,
+    next: next,
+    previous: previous,
+    getCurrentScreen: getCurrentScreen,
+    isFirstScreen: isFirstScreen,
+    isLastScreen: isLastScreen,
+    getContainers: getContainers,
+    getCurrentScreenTitle: getCurrentScreenTitle,
+    getScreenCountAsArray: getScreenCountAsArray,
+    getScreenOfField: getScreenOfField,
+    goToScreen: goToScreen,
+    setCheckingOut: setCheckingOut,
+    isCheckingOut: isCheckingOut
+  };
+
+  function getCurrentScreen() {
+    return currentScreen;
+  }
+
+  function goToScreen(newScreenNum) {
+    if (isCheckingOut())
+      setCheckingOut(false);
+    currentScreen = newScreenNum;
+  }
+
+  function setCheckingOut(newBooleanValue) {
+    checkingOut = newBooleanValue;
+  }
+
+  function isCheckingOut() {
+    return checkingOut;
+  }
+
+  /**
+   * Get the title of the screen we are currently on
+   * @return {String}  The screen title
+   */
+  function getCurrentScreenTitle(sys_class_name, name) {
+    if (sys_class_name == 'sc_cat_item_producer') {
+      if (form_containers.length != 0 && !isFirstScreen()) {
+        if(!form_containers[currentScreen][0].caption) {
+          return name + ' (cont...)'
+        } else {
+          return form_containers[currentScreen][0].caption;
+        }
+      }
+    } else if (form_containers.length != 0 && !isFirstScreen() && !isLastScreen()) {
+      return form_containers[currentScreen][0].caption;
+    } else {
+      return '';
+    }
+  }
+
+  function getScreenCountAsArray() {
+    return new Array(totalScreenCount);
+  }
+
+  function setTotalScreenCount(newScreenCount) {
+    totalScreenCount = newScreenCount;
+  }
+
+  function isFirstScreen() {
+    return currentScreen === 0;
+  }
+
+  function isLastScreen() {
+    return currentScreen === totalScreenCount - 1;
+  }
+  
+  
+	function next() {
+    currentScreen++;
+  }
+  
+  function previous() {
+    currentScreen--;
+  }
+  
+  function getScreenOfField(fieldName) {
+    function findFieldNameMatch(screen) {
+      for(var i = 0; i < screen.length; i++) {
+        if(screen[i].columns){ 
+          for (var j = 0; j < screen[i].columns.length; j++) {
+            for (var y = 0; y < screen[i].columns[j].fields.length; y++) {
+              if(screen[i].columns[j].fields[y].name == fieldName) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+      // Searched through all containers of this screen without a match
+      return false; 
+    }  
+    return _.findIndex(form_containers, findFieldNameMatch);
+  }
+  
+  /** 
+   * Group containers that do not have caption with the 
+   * previous container.
+   * @param {array} c
+   */
+	function regroupContainers(c, sys_class_name) {
+		var newCGroupings = c.reduce(function(acc, cv, ci, arr) {
+      /**
+       * Allow the first section not to have a caption.
+       * The name of the item visually acts as the caption.
+       */
+			if(!cv.caption && !cv.captionDisplay && ci !== 0) {
+				acc[acc.length - 1].push(cv);
+			} else {
+				acc.push([cv]);
+			}
+			return acc;
+    }, []);
+    // Add in two empty arrays as place markers for the intro and final screens
+    newCGroupings.splice(0,0,[]);
+    if (sys_class_name != 'sc_cat_item_producer')
+      newCGroupings.splice(newCGroupings.length,0,[]);
+    setTotalScreenCount(newCGroupings.length);
+		return newCGroupings;
+	}
+	
+	function init(containers, sys_class_name) {
+    form_containers = regroupContainers(containers, sys_class_name);
+    console.log(form_containers);
+	}
+  
+	function getContainers() {
+		return form_containers[currentScreen];
+	}
+});]]></script>
+        <script_name>Service.McUtilContainers</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-19 23:53:19</sys_created_on>
+        <sys_id>5c01e3fadbfd270074f7f2353a96194a</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>x_snc_multicat.Service.McUtilContainers</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_update_name>sys_ui_script_5c01e3fadbfd270074f7f2353a96194a</sys_update_name>
+        <sys_updated_by>james.tandy@snc</sys_updated_by>
+        <sys_updated_on>2018-11-20 02:21:17</sys_updated_on>
+        <ui_type>1</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

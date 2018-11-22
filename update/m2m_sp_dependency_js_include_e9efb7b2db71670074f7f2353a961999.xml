@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_dependency_js_include">
+    <m2m_sp_dependency_js_include action="INSERT_OR_UPDATE">
+        <order>200</order>
+        <sp_dependency display_value="McUtil">dbf2673edbfd270074f7f2353a961928</sp_dependency>
+        <sp_js_include display_value="Service.McUtilContainers">b4126ffadbfd270074f7f2353a9619a1</sp_js_include>
+        <sys_class_name>m2m_sp_dependency_js_include</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-20 02:07:23</sys_created_on>
+        <sys_id>e9efb7b2db71670074f7f2353a961999</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>McUtil.Service.McUtilContainers</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_update_name>m2m_sp_dependency_js_include_e9efb7b2db71670074f7f2353a961999</sys_update_name>
+        <sys_updated_by>james.tandy@snc</sys_updated_by>
+        <sys_updated_on>2018-11-20 02:10:17</sys_updated_on>
+    </m2m_sp_dependency_js_include>
+</record_update>

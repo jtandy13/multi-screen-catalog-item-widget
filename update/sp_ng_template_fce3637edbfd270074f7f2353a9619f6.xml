@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_ng_template">
+    <sp_ng_template action="INSERT_OR_UPDATE">
+        <id>si-mc-order-now-screen</id>
+        <sp_widget display_value="Multi-Screen Catalog Item">947027badbfd270074f7f2353a96195c</sp_widget>
+        <sys_class_name>sp_ng_template</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-20 00:05:14</sys_created_on>
+        <sys_id>fce3637edbfd270074f7f2353a9619f6</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>si-mc-order-now-screen</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_update_name>sp_ng_template_fce3637edbfd270074f7f2353a9619f6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-11-22 03:34:11</sys_updated_on>
+        <template><![CDATA[<!-- Detail section with a picture -->
+<div class="si-mc-extra-detail">
+  <div class="si-mc-detail-flex-shrink si-mc-item-img" ng-if="c.hasImage()">
+    <img alt="{{::data.sc_cat_item.name}}" ng-src="{{::data.sc_cat_item.picture}}?t=medium" />
+  </div>
+  <div class="si-mc-detail-flex-grow" ng-if="!c.isCheckingOut()">
+    <!-- Title -->
+    <div class="si-mc-title">
+      <h1>{{c.getCurrentTitle(c.data.sc_cat_item.sys_class_name)}}</h1>
+    </div>
+    <div class="si-mc-short-desc">
+      <h4>{{::data.sc_cat_item.short_description}}</h4>
+    </div>
+    <div class="si-mc-checkout-data" ng-if="data.showPrices && (data.sc_cat_item.price || data.sc_cat_item.recurring_price)">
+      <label>${Price}:</label> {{data.sc_cat_item.price}}
+      <em ng-if="data.sc_cat_item.recurring_price" class="cat_item_price"> + {{data.sc_cat_item.recurring_price + ' ' + data.sc_cat_item.recurring_price_frequency}}</em>
+    </div>
+    <div class="si-mc-checkout-data" ng-if="data.sc_cat_item.estimated_delivery_time">
+      <label>${Delivery Time}:</label> {{::data.sc_cat_item.estimated_delivery_time}}
+    </div>
+    <div class="si-mc-checkout-data" id="quantitySelectorBox">
+      <lable for="quantitySelector" id="quantitySelectorLabel" class="align-middle">
+        <label id="quantityLabelText">Quantity&nbsp;</label>
+      </lable>
+      <select class="form-control" ng-model="c.quantity" id="quantitySelector">
+        <option ng-repeat="num in data.choiceListQuantity" value={{::num.value}}>{{::num.label}}</option>
+      </select>
+    </div>
+    <div class="si-mc-checkout-data">
+      <label for="requested-for">${Request For}
+        <i class="fa fa-info-circle" uib-tooltip="${Request for yourself or on behalf of another person}" tooltip-placement="right"
+          tooltip-append-to-body="true"></i>
+      </label>
+      <sn-record-picker id="requested-for" field="c.requestedFor" table="'sys_user'" display-field="'name'" display-fields="c.options.reqForDispCols"
+        value-field="'sys_id'" search-fields="c.options.reqForSearchCols" default-query="c.options.reqForQuery" page-size="100"
+        options="{allowClear : false}" sn-disabled="!c.options.disable_req_for">
+      </sn-record-picker>
+    </div>
+    <div class="si-mc-checkout-data">
+      <label for="deliver-to" tabindex="0">${Delivery Information}
+        <span class="text-muted"> ${(Optional)}</span>
+      </label>
+      <textarea class="form-control" ng-model="c.deliverTo" id="deliver-to" rows="2"></textarea>
+    </div>
+    <div class="si-mc-checkout-data">
+      <label for="special-instructions" tabindex="0">${Special Instructions}
+        <span class="text-muted"> ${(Optional)}</span>
+      </label>
+      <textarea class="form-control" ng-model="c.special_instructions" id="special-instructions" rows="2"></textarea>
+    </div>
+    <div class="si-mc-attachments-mobile">
+      <div class="si-mc-label">
+        <span>Attachments</span>
+        <button class="si-cm-add" si-mc-button-upload>
+          <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+      </div>
+      <si-mc-attachment-manager table="::c.data._attachmentTable" sys-id="::c.data._generatedItemGUID" omit-edit="false"></si-mc-attachment-manager>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_ng_template>
+</record_update>

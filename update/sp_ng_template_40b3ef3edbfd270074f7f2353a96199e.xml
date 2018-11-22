@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_ng_template">
+    <sp_ng_template action="INSERT_OR_UPDATE">
+        <id>si-mc-form</id>
+        <sp_widget display_value="Multi-Screen Catalog Item">947027badbfd270074f7f2353a96195c</sp_widget>
+        <sys_class_name>sp_ng_template</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-20 00:04:27</sys_created_on>
+        <sys_id>40b3ef3edbfd270074f7f2353a96199e</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>si-mc-form</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_update_name>sp_ng_template_40b3ef3edbfd270074f7f2353a96199e</sys_update_name>
+        <sys_updated_by>james.tandy@snc</sys_updated_by>
+        <sys_updated_on>2018-11-20 00:32:31</sys_updated_on>
+        <template><![CDATA[<div si-mc-containers>
+  <fieldset>
+    <div ng-repeat="container in getContainers()">
+      <div class="si-mc-body container-fluid">
+        <sp-variable-layout ng-init="containers=[container]"></sp-variable-layout>
+      </div>
+     </div> 
+  </fieldset>
+  <div ng-init="execItemScripts()"></div>
+</div>]]></template>
+    </sp_ng_template>
+</record_update>

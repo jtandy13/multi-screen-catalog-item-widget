@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_js_include">
+    <sp_js_include action="INSERT_OR_UPDATE">
+        <display_name>Module.McUtil</display_name>
+        <source>local</source>
+        <sys_class_name>sp_js_include</sys_class_name>
+        <sys_created_by>james.tandy@snc</sys_created_by>
+        <sys_created_on>2018-11-19 23:56:52</sys_created_on>
+        <sys_id>e2e1e7fadbfd270074f7f2353a961903</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Module.McUtil</sys_name>
+        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_ui_script display_value="x_snc_multicat.Module.McUtil">0fc063fadbfd270074f7f2353a9619c1</sys_ui_script>
+        <sys_update_name>sp_js_include_e2e1e7fadbfd270074f7f2353a961903</sys_update_name>
+        <sys_updated_by>james.tandy@snc</sys_updated_by>
+        <sys_updated_on>2018-11-19 23:56:52</sys_updated_on>
+        <url/>
+    </sp_js_include>
+</record_update>
