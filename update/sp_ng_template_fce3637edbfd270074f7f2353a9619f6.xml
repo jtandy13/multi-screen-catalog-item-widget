@@ -6,14 +6,14 @@
         <sys_created_by>james.tandy@snc</sys_created_by>
         <sys_created_on>2018-11-20 00:05:14</sys_created_on>
         <sys_id>fce3637edbfd270074f7f2353a9619f6</sys_id>
-        <sys_mod_count>9</sys_mod_count>
+        <sys_mod_count>21</sys_mod_count>
         <sys_name>si-mc-order-now-screen</sys_name>
-        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_package display_value="Multi-Screen Catalog Item" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
         <sys_policy/>
-        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_scope display_value="Multi-Screen Catalog Item">81381b32dbfd270074f7f2353a9619d4</sys_scope>
         <sys_update_name>sp_ng_template_fce3637edbfd270074f7f2353a9619f6</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-11-22 03:34:11</sys_updated_on>
+        <sys_updated_by>james.tandy</sys_updated_by>
+        <sys_updated_on>2019-01-07 04:48:09</sys_updated_on>
         <template><![CDATA[<!-- Detail section with a picture -->
 <div class="si-mc-extra-detail">
   <div class="si-mc-detail-flex-shrink si-mc-item-img" ng-if="c.hasImage()">
@@ -36,9 +36,9 @@
     </div>
     <div class="si-mc-checkout-data" id="quantitySelectorBox">
       <lable for="quantitySelector" id="quantitySelectorLabel" class="align-middle">
-        <label id="quantityLabelText">Quantity&nbsp;</label>
+        <label id="quantityLabelText">${Quantity}&nbsp;</label>
       </lable>
-      <select class="form-control" ng-model="c.quantity" id="quantitySelector">
+      <select ng-model="c.quantity" id="quantitySelector">
         <option ng-repeat="num in data.choiceListQuantity" value={{::num.value}}>{{::num.label}}</option>
       </select>
     </div>

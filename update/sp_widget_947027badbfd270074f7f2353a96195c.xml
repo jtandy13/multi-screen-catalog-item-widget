@@ -15,7 +15,9 @@
   c.getCurrentScreen = McUtilContainers.getCurrentScreen;
   c.goToScreen = McUtilContainers.goToScreen;
   c.getScreenOfField = McUtilContainers.getScreenOfField;
-
+	
+	$scope.isSelect2 = false;
+	
   c.$onInit = function () {
     McUtilContainers.init(c.data.sc_cat_item._sections, c.data.sc_cat_item.sys_class_name);
 
@@ -272,31 +274,35 @@
 }]]></client_script>
         <controller_as>c</controller_as>
         <css>/* SCSS Variables and Mixins*/
+$si-mc-dark-color: #2D2B5D;
+$si-mc-light-text-color: #FFFFFF;
+
 $si-mc-max-height: 700px;
-$si-mc-max-width: 950px;
 $si-mc-background-color: #FFFFFF;
 $si-mc-indicator-background-color: #EEEEEE;
-$si-mc-indicator-background-color-active: #2D2B5D;
-$si-mc-indicator-color: #2D2B5D;
-$si-mc-indicator-color-active: #FFFFFF;
-$si-mc-attachment-background-color: #EEEEEE;
-$si-mc-attachment-color: #2D2B5D;
-$si-mc-attachment-btn-background-color: #2D2B5D;
+$si-mc-indicator-background-color-active: $si-mc-dark-color !default;
+$si-mc-field-label-color: $si-mc-dark-color !default;
+$si-mc-title-color: $si-mc-dark-color !default;
+$si-mc-indicator-color: $si-mc-dark-color !default;
+$si-mc-indicator-color-active: $si-mc-light-text-color !default;
+$si-mc-attachment-color: $si-mc-dark-color !default;
+$si-mc-attachment-btn-background-color: $si-mc-dark-color !default;
 $si-mc-attachment-pill-background-color: #EEEEEE;
-$si-mc-attachment-pill-color: #2D2B5D;
-$si-mc-attachment-btn-color: #FFFFFF;
+$si-mc-attachment-btn-color: $si-mc-light-text-color !default;
 $si-mc-border-radius: 3px !default;
 $si-mc-action-bar-background-color: #DDDDDD;
+$si-mc-image-height: auto;
+$si-mc-image-width: auto;
 
 @mixin title-pack {
   font-size: 40px;
-  color: #2D2B5D;
+  color: $si-mc-title-color;
   letter-spacing: -0.5px;
 }
 
 @mixin label-pack {
   font-size: 16px;
-  color: #2D2B5D;
+  color: $si-mc-field-label-color;
   line-height: 24px;
 }
 
@@ -419,7 +425,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
   
   li {
     background-color: $si-mc-attachment-pill-background-color;
-    color: $si-mc-attachment-pill-color;
+    color: $si-mc-attachment-color;
     border-radius: $si-mc-border-radius;
     padding: 3px 5px;
     cursor: pointer;
@@ -430,7 +436,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
     margin: 3px 0 3px 5px;
     
     a, a:hover, a:visited, a:focus {
-      color: $si-mc-attachment-pill-color;
+      color: $si-mc-attachment-color;
     }
     
   }
@@ -444,6 +450,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
     height: 23px;
     width: 23px;
     border-radius: $si-mc-border-radius;
+    border: none;
     background-color: $si-mc-attachment-btn-background-color;
     color: $si-mc-attachment-btn-color;
     position: relative;
@@ -472,7 +479,6 @@ $si-mc-action-bar-background-color: #DDDDDD;
 
 .si-mc-intro-screen {
   display: flex;
-  flex-wrap: wrap;
 
   h1 {
     @include title-pack;
@@ -485,11 +491,15 @@ $si-mc-action-bar-background-color: #DDDDDD;
   justify-content: center;
   align-items: flex-start;
   min-width: 300px;
-  margin: 0px 20px 0px 20px;
+  margin: 0px 20px 0px 60px;
 }
 
 .si-mc-cust-desc {
-  margin: 30px 10px 0px 10px;
+  margin: 30px 10px 30px 10px;
+}
+
+.si-mc-cust-desc-no-pic {
+    margin: 30px 40px;
 }
 
 .si-mc-short-desc {
@@ -598,6 +608,19 @@ $si-mc-action-bar-background-color: #DDDDDD;
 
 /* Media Queries */
 @media (min-width: 320px) and (max-width: 480px) {
+    .container-fluid {
+        padding: 0 !important;
+    }
+
+    .si-mc-mainbody {
+        margin-top: 40px;
+        margin-bottom: 0;
+    }
+
+    .si-mc-cust-desc, .si-mc-cust-desc-no-pic {
+        margin: 30px 20px;
+    }
+
   .si-mc-content {
     background-color: $si-mc-background-color;
     border-radius: $si-mc-border-radius;
@@ -611,9 +634,18 @@ $si-mc-action-bar-background-color: #DDDDDD;
   .si-mc-head {
     display: none;
   }
+  
+  .si-mc-intro-screen {
+      flex-wrap: wrap; 
+      min-height: 300px;
+  }
+
+  .si-mc-item-img {
+      margin: 0px 20px 0px 20px;
+  }
 
   .si-mc-form {
-    margin: 0;
+    margin: 0px 20px;
 
     legend {
       font-size: 30px;
@@ -621,9 +653,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
   }
 
   .si-mc-detail-flex-grow {
-    margin: 0;
-    padding-right: 8px;
-    padding-left: 8px;
+    margin: 20px 20px 40px 20px;
   }
 
   .si-mc-action-bar {
@@ -694,9 +724,21 @@ $si-mc-action-bar-background-color: #DDDDDD;
         <has_preview>false</has_preview>
         <id>multicat</id>
         <internal>false</internal>
-        <link/>
+        <link><![CDATA[function(scope, elem) {
+	
+	var $timeout = $injector.get('$timeout');
+	
+	scope.implementSelect2 = function() {
+		$timeout(function() {
+			var qs = elem.find('#quantitySelector');
+			qs.select2();
+			scope.isSelect2 = true;
+		});
+	}
+	
+}]]></link>
         <name>Multi-Screen Catalog Item</name>
-        <option_schema/>
+        <option_schema>[{"name":"show_add_cart_button","section":"Behavior","default_value":"true","label":"Show Add Cart Button","type":"boolean"},{"name":"show_delivery_time","section":"Presentation","default_value":"true","label":"Show Delivery Time","type":"boolean"},{"name":"show_price","section":"Presentation","default_value":"true","label":"Show Price","type":"boolean"},{"name":"redirect_page_on_order_now","section":"Behavior","default_value":"sc_request","label":"Redirect Page on Order Now","type":"string"},{"name":"redirect_page_on_submit","section":"Behavior","default_value":"ticket","label":"Redirect Page on Submit","type":"string"}]</option_schema>
         <public>false</public>
         <roles/>
         <script><![CDATA[// populate the 'data' variable with catalog item, variables, and variable view
@@ -902,14 +944,14 @@ $si-mc-action-bar-background-color: #DDDDDD;
         <sys_created_by>james.tandy@snc</sys_created_by>
         <sys_created_on>2018-11-19 23:49:56</sys_created_on>
         <sys_id>947027badbfd270074f7f2353a96195c</sys_id>
-        <sys_mod_count>185</sys_mod_count>
+        <sys_mod_count>272</sys_mod_count>
         <sys_name>Multi-Screen Catalog Item</sys_name>
-        <sys_package display_value="multicat" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
+        <sys_package display_value="Multi-Screen Catalog Item" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
         <sys_policy/>
-        <sys_scope display_value="multicat">81381b32dbfd270074f7f2353a9619d4</sys_scope>
+        <sys_scope display_value="Multi-Screen Catalog Item">81381b32dbfd270074f7f2353a9619d4</sys_scope>
         <sys_update_name>sp_widget_947027badbfd270074f7f2353a96195c</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-11-22 03:59:36</sys_updated_on>
+        <sys_updated_by>james.tandy</sys_updated_by>
+        <sys_updated_on>2019-01-07 05:22:07</sys_updated_on>
         <template><![CDATA[<div class="si-multicat-main" si-mc-drag-drop-upload>
 
   <!-- Drag and drop overlay -->
@@ -917,7 +959,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
     <div class="si-mc-drag-drop-mask"></div>
     <div>
       <i class="fa fa-upload" aria-hidden="true"></i>
-      <br/> Upload
+      <br/> ${Upload}
     </div>
   </div>
 
@@ -926,7 +968,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
     <div class="si-mc-head">
 
       <div class="si-mc-attachments">
-        <div class="si-mc-label">Attachments</div>
+        <div class="si-mc-label">${Attachments}</div>
         <button si-mc-button-upload>
           <i class="fa fa-plus" aria-hidden="true"></i>
         </button>
@@ -949,7 +991,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
       <!-- Intro screen -->
       <div ng-include="'si-mc-intro-screen'" ng-if="c.getCurrentScreen() == 0"></div>
 
-      <!-- Form Screens-->
+      <!-- Form Screens -->
       <div class="si-mc-form">
         <!-- spCatItem directive manages price changes for the catalog item -->
         <sp-cat-item item="::data.sc_cat_item" ></sp-cat-item>
@@ -959,7 +1001,9 @@ $si-mc-action-bar-background-color: #DDDDDD;
       </div>
 
       <!-- Order Now Screen -->
-      <div ng-include="'si-mc-order-now-screen'" ng-if="c.isLastScreen() && !c.isRecordProducer()"></div>
+      <div ng-if="c.isLastScreen() && !c.isRecordProducer()">
+        <div ng-include="'si-mc-order-now-screen'" onload="implementSelect2()" ></div>
+      </div>
       
     </div>
     <!-- Actions -->
@@ -968,7 +1012,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
         <!-- Left side (secondary) -->
         <div class="si-mc-secondary">
           <button ng-click="c.previous()" ng-if="c.getCurrentScreen() > 0">
-            PREVIOUS
+            ${PREVIOUS}
           </button>
         </div>
     
@@ -976,7 +1020,7 @@ $si-mc-action-bar-background-color: #DDDDDD;
         <div class="si-mc-primary">
           <div class="action-group">
             <button ng-click="c.next()" ng-if="!c.isLastScreen()">
-              NEXT
+              ${NEXT}
             </button>
             <button ng-click="c.triggerOnSubmit()" ng-if="c.isLastScreen() && c.isRecordProducer()">
               ${SUBMIT}
