@@ -276,6 +276,7 @@
         <css>/* SCSS Variables and Mixins*/
 $si-mc-dark-color: #2D2B5D;
 $si-mc-light-text-color: #FFFFFF;
+$si-mc-action-background-color: #DDDDDD;
 
 $si-mc-max-height: 700px;
 $si-mc-background-color: #FFFFFF;
@@ -290,7 +291,7 @@ $si-mc-attachment-btn-background-color: $si-mc-dark-color !default;
 $si-mc-attachment-pill-background-color: #EEEEEE;
 $si-mc-attachment-btn-color: $si-mc-light-text-color !default;
 $si-mc-border-radius: 3px !default;
-$si-mc-action-bar-background-color: #DDDDDD;
+$si-mc-action-bar-background-color: $si-mc-action-background-color;
 $si-mc-image-height: auto;
 $si-mc-image-width: auto;
 
@@ -587,10 +588,10 @@ $si-mc-image-width: auto;
 
 
   button {
-    background-color: #2D2B5D;
+    background-color: $si-mc-dark-color;
     border: 0px;
     font-size: 18px;
-    color: #FFFFFF;
+    color: $si-mc-light-text-color;
   }
 }
 
@@ -599,8 +600,8 @@ $si-mc-image-width: auto;
 
   button {
     background-color: transparent;
-    border: 2px solid #2D2B5D;
-    color: #2D2B5D;
+    border: 2px solid $si-mc-dark-color;
+    color: $si-mc-dark-color;
     font-size: 16px;
     margin-left: 20px;
   }
@@ -945,14 +946,14 @@ $si-mc-image-width: auto;
         <sys_created_by>james.tandy@snc</sys_created_by>
         <sys_created_on>2018-11-19 23:49:56</sys_created_on>
         <sys_id>947027badbfd270074f7f2353a96195c</sys_id>
-        <sys_mod_count>275</sys_mod_count>
+        <sys_mod_count>286</sys_mod_count>
         <sys_name>Multi-Screen Catalog Item</sys_name>
         <sys_package display_value="Multi-Screen Catalog Item" source="x_snc_multicat">81381b32dbfd270074f7f2353a9619d4</sys_package>
         <sys_policy/>
         <sys_scope display_value="Multi-Screen Catalog Item">81381b32dbfd270074f7f2353a9619d4</sys_scope>
         <sys_update_name>sp_widget_947027badbfd270074f7f2353a96195c</sys_update_name>
         <sys_updated_by>james.tandy</sys_updated_by>
-        <sys_updated_on>2019-01-07 22:54:56</sys_updated_on>
+        <sys_updated_on>2019-01-08 00:41:23</sys_updated_on>
         <template><![CDATA[<div class="si-multicat-main" si-mc-drag-drop-upload>
 
   <!-- Drag and drop overlay -->
