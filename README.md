@@ -18,9 +18,21 @@ With a few quick changes the widget's CSS-SASS variables, you can apply a whole 
 Changes to the color palette within the widget editor:
 <img src="sass-variable-changes.png">
 
-The widget has a responsive design to fit any screen size:
-<img src="mobile.png">
-
 # Implementation
+**Import the Multi-Screen Catalog Item Widget to your instance:**
+1. Open Studio on your instance.
+2. In the "Load Application" dialog, choose "Import From Source Control"
+3. Add the following to the "URL" field and click "Import" - https://github.com/jtandy13/multi-screen-catalog-item-widget.git
+
+**Demo the widget with two pre-configured catalog items guaranteed to look great:**
+1. Open Studio on your instance.
+2. In the "Load Application" dialog, choose "Import From Source Control"
+3. Add the following to the "URL" field and click "Import" - https://github.com/jtandy13/multi-screen-catalog-item-demo-items.git
+4. You can demo the two widgets on the new "multicat" Service Portal page with the following urls:
+https://your-instance.service-now.com/sp?id=multicat&sys_id=f0a99c7adb726300f530c6fc349619fe
+https://your-instance.service-now.com/sp?id=multicat&sys_id=39a5ec32dbb26300f530c6fc34961972
+
+
+
 # Demo Data
 # Best Practice
