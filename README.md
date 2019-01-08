@@ -5,6 +5,7 @@ The widget works with standard catalog items as well as record producers. Upon o
 
 The widget is easily configurable with instance options and the colors can easily be change to meet any company palette with the use of SASS variables. 
 # Screenshots
+<img src="main-screen-blue.png">
 # Implementation
 # Demo Data
 # Best Practice
