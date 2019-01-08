@@ -18,6 +18,9 @@ With a few quick changes the widget's CSS-SASS variables, you can apply a whole 
 Changes to the color palette within the widget editor:
 <img src="sass-variable-changes.png">
 
+The widget has a responsive design to fit any screen size:
+<img src="mobile.png">
+
 # Implementation
 # Demo Data
 # Best Practice
