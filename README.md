@@ -45,8 +45,6 @@ https://your-instance.service-now.com/sp?id=multicat&sys_id=sys_id-of-your-cat-i
 2. Open the "sc_cat_item" Service Portal page in the Service Portal Page Designer with the following url: https://your-instance.service-now.com/$spd.do#/sp/editor/sc_cat_item/e2656985ff630200ba13ffffffffff68
 3. Remove the "SC Catalog Item" widget from the page replacing it with the "Multi-Screen Catalog Item" widget.
 
-# Demo Data
-
 # Best Practice
 - All catalog items must have a high definition image.
 - All catalog items must have a filled-out Short Description and Description field.
