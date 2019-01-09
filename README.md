@@ -10,7 +10,7 @@ The original color scheme:
 <img src="main-screen-blue.png">
 
 Each new screen displays the next group of variables within the catalog item's containers.
-![](name-of-giphy.gif)
+![](demo_low.gif)
 
 With a few quick changes the widget's CSS-SASS variables, you can apply a whole new color palette to the widget.
 <img src="main-screen-red.png">
