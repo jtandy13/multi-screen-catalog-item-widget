@@ -19,12 +19,12 @@ Changes to the color palette within the widget editor:
 <img src="sass-variable-changes.png">
 
 # Implementation
-**Import the Multi-Screen Catalog Item Widget to your instance:**
+## Import the Multi-Screen Catalog Item Widget to your instance:
 1. Open Studio on your instance.
 2. In the **Load Application** dialog, choose **Import From Source Control**
 3. Add the following to the **URL** field and click **Import** - `https://github.com/jtandy13/multi-screen-catalog-item-widget.git`
 
-**Demo the widget with two pre-configured catalog items guaranteed to look great:**
+## Demo the widget with two pre-configured catalog items guaranteed to look great:
 1. Open Studio on your instance.
 2. In the **Load Application** dialog, choose **Import From Source Control**
 3. Add the following to the **URL** field and click **Import** - `https://github.com/jtandy13/multi-screen-catalog-item-demo-items.git`
@@ -32,7 +32,7 @@ Changes to the color palette within the widget editor:
 `https://your-instance.service-now.com/sp?id=multicat&sys_id=f0a99c7adb726300f530c6fc349619fe`
 `https://your-instance.service-now.com/sp?id=multicat&sys_id=39a5ec32dbb26300f530c6fc34961972`
 
-**Demo a custom catalog item using the Multi-Screen Catalog Item Widget**
+## Demo a custom catalog item using the Multi-Screen Catalog Item Widget
 1. Add a high definition image to the **Picture** field of the catalog item you are using.
 2. Make sure that the catalog item has a filled-out Short Description and Description.
 3. Add **Container Start** and **Container End** variables around groups of variables. This will form the different screens of variables in the widget. 
@@ -40,7 +40,7 @@ Changes to the color palette within the widget editor:
 5. Demo the custom catalog item using the `multicat` Service Portal page with the following url:
 `https://your-instance.service-now.com/sp?id=multicat&sys_id=sys_id-of-your-cat-item`
 
-**Use the Multi-Screen Catalog Item Widget as the default widget for all catalog items**
+## Use the Multi-Screen Catalog Item Widget as the default widget for all catalog items
 1. Make sure that all of your catalog items follow the best practice advice below.
 2. Open the `sc_cat_item` Service Portal page in the Service Portal Page Designer with the following url: `https://your-instance.service-now.com/$spd.do#/sp/editor/sc_cat_item/e2656985ff630200ba13ffffffffff68`
 3. Remove the **SC Catalog Item** widget from the page replacing it with the **Multi-Screen Catalog Item** widget.
