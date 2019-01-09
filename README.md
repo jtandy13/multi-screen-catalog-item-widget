@@ -21,8 +21,8 @@ Changes to the color palette within the widget editor:
 # Implementation
 **Import the Multi-Screen Catalog Item Widget to your instance:**
 1. Open Studio on your instance.
-2. In the "Load Application" dialog, choose "Import From Source Control"
-3. Add the following to the "URL" field and click "Import" - https://github.com/jtandy13/multi-screen-catalog-item-widget.git
+2. In the **Load Application** dialog, choose **Import From Source Control**
+3. Add the following to the **URL** field and click **Import** - `https://github.com/jtandy13/multi-screen-catalog-item-widget.git`
 
 **Demo the widget with two pre-configured catalog items guaranteed to look great:**
 1. Open Studio on your instance.
