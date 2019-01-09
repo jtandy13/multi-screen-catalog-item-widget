@@ -32,7 +32,16 @@ Changes to the color palette within the widget editor:
 https://your-instance.service-now.com/sp?id=multicat&sys_id=f0a99c7adb726300f530c6fc349619fe
 https://your-instance.service-now.com/sp?id=multicat&sys_id=39a5ec32dbb26300f530c6fc34961972
 
-
+**Demo a custom catalog item using the Multi-Screen Catalog Item Widget**
+1. Add a high definition image to the "Picture" field of the catalog item you are using.
+2. Make sure that the catalog item has a filled-out Short Description and Description.
+3. Add "Container Start" and "Container End" variables around groups of variables. This will form the different screens of variables in the widget. 
+4. Make sure that the "Container Start" variables all display a title. These will be the headings for each screen in the widget.
 
 # Demo Data
+
 # Best Practice
+- All catalog items must have a high definition image.
+- All catalog items must have a filled-out Short Description and Description field.
+- Catalog items with more than five variables should be grouped by "Container Start" and "Container End" variables.
+- "Container Start" variables should all display a title.
