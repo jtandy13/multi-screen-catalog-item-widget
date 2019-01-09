@@ -37,6 +37,13 @@ https://your-instance.service-now.com/sp?id=multicat&sys_id=39a5ec32dbb26300f530
 2. Make sure that the catalog item has a filled-out Short Description and Description.
 3. Add "Container Start" and "Container End" variables around groups of variables. This will form the different screens of variables in the widget. 
 4. Make sure that the "Container Start" variables all display a title. These will be the headings for each screen in the widget.
+5. Demo the custom catalog item using the "multicat" Service Portal page with the following url:
+https://your-instance.service-now.com/sp?id=multicat&sys_id=sys_id-of-your-cat-item
+
+**Use the Multi-Screen Catalog Item Widget as the default widget for all catalog items**
+1. Make sure that all of your catalog items follow the best practice advice below.
+2. Open the "sc_cat_item" Service Portal page in the Service Portal Page Designer with the following url: https://your-instance.service-now.com/$spd.do#/sp/editor/sc_cat_item/e2656985ff630200ba13ffffffffff68
+3. Remove the "SC Catalog Item" widget from the page replacing it with the "Multi-Screen Catalog Item" widget.
 
 # Demo Data
 
